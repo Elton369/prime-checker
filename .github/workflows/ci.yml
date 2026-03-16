@@ -9,23 +9,28 @@ on:
       - main
     tags:
       - 'v*'
+  pull_request:
+    branches:
+      - main
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Build program
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Run build script
         run: |
           chmod +x cicd/run_make.sh
           ./cicd/run_make.sh
 
       - name: Upload binary artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: prime-checker-binary
           path: usr/bin/prime-checker
@@ -37,7 +42,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Build binary for tests
+        run: |
+          chmod +x cicd/run_make.sh
+          ./cicd/run_make.sh
 
       - name: Run tests
         run: |
@@ -51,12 +64,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install packaging tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential dpkg
+        run: sudo apt-get update && sudo apt-get install -y build-essential dpkg
 
       - name: Build deb package
         run: |
@@ -64,7 +75,7 @@ jobs:
           ./cicd/run_package.sh
 
       - name: Upload deb artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: prime-checker-deb
           path: build/*.deb
@@ -76,7 +87,14 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Build deb package for Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential dpkg
+          chmod +x cicd/run_package.sh
+          ./cicd/run_package.sh
 
       - name: Run Docker stage
         run: |
@@ -91,14 +109,21 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Build package again
+      - name: Install packaging tools
+        run: sudo apt-get update && sudo apt-get install -y build-essential dpkg
+
+      - name: Build release package
         run: |
           chmod +x cicd/run_package.sh
           ./cicd/run_package.sh
+          chmod +x cicd/run_release.sh
+          ./cicd/run_release.sh
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: build/*.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
