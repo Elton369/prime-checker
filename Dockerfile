@@ -1,0 +1,13 @@
+FROM ubuntu:22.04
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y dpkg libc6 libstdc++6 && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY build/*.deb /app/
+
+RUN dpkg -i /app/*.deb || apt-get update && apt-get install -f -y
+
+CMD ["prime-checker"]
