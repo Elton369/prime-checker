@@ -15,7 +15,7 @@ on:
       - main
 
 env:
-  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/prime-checker
+  IMAGE_NAME: ghcr.io/elton369/prime-checker
 
 jobs:
   build:
