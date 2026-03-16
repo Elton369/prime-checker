@@ -1,0 +1,44 @@
+stages:
+  - make
+  - test
+  - package
+  - deploy
+
+make_job:
+  stage: make
+  script:
+    - chmod +x cicd/run_make.sh
+    - ./cicd/run_make.sh
+  artifacts:
+    paths:
+      - usr/bin/prime-checker
+
+test_job:
+  stage: test
+  script:
+    - chmod +x cicd/run_tests.sh
+    - ./cicd/run_tests.sh
+  dependencies:
+    - make_job
+
+package_job:
+  stage: package
+  script:
+    - chmod +x cicd/run_package.sh
+    - ./cicd/run_package.sh
+  dependencies:
+    - make_job
+  artifacts:
+    paths:
+      - build/*.deb
+
+deploy_job:
+  stage: deploy
+  script:
+    - chmod +x cicd/run_deploy.sh
+    - ./cicd/run_deploy.sh
+  dependencies:
+    - package_job
+  artifacts:
+    paths:
+      - release/
