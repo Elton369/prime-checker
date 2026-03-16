@@ -35,8 +35,8 @@ package_job:
 deploy_job:
   stage: deploy
   script:
-    - chmod +x cicd/run_deploy.sh
-    - ./cicd/run_deploy.sh
+    - chmod +x cicd/run_release.sh
+    - ./cicd/run_release.sh
   dependencies:
     - package_job
   artifacts:

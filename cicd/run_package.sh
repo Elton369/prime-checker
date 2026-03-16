@@ -1,15 +1,21 @@
 #!/bin/bash
-
 set -e
 
 echo "===== PACKAGE STAGE ====="
 
-mkdir -p build/prime-checker/usr/bin
-mkdir -p build/prime-checker/DEBIAN
+cd src
+make clean
+make
+cd ..
 
-cp usr/bin/prime-checker build/prime-checker/usr/bin/
-cp DEBIAN/control build/prime-checker/DEBIAN/
+rm -rf build
+mkdir -p build/prime-checker_1.0.0_amd64/usr/bin
+mkdir -p build/prime-checker_1.0.0_amd64/DEBIAN
 
-dpkg-deb --build build/prime-checker
+cp usr/bin/prime-checker build/prime-checker_1.0.0_amd64/usr/bin/
+cp DEBIAN/control build/prime-checker_1.0.0_amd64/DEBIAN/control
 
-echo "Package created"
+dpkg-deb --build build/prime-checker_1.0.0_amd64
+
+echo "Package created:"
+ls -l build/*.deb

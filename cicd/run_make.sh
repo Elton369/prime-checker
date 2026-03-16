@@ -1,16 +1,14 @@
 #!/bin/bash
-
 set -e
 
 echo "===== BUILD STAGE ====="
 
 cd src
-
 make clean
 make
 
 if [ ! -f ../usr/bin/prime-checker ]; then
-    echo "Build failed"
+    echo "Build failed: binary not found"
     exit 1
 fi
 
