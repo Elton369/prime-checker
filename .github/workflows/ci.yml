@@ -2,6 +2,7 @@ name: CI Pipeline
 
 permissions:
   contents: write
+  packages: write
 
 on:
   push:
@@ -12,6 +13,9 @@ on:
   pull_request:
     branches:
       - main
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/prime-checker
 
 jobs:
   build:
@@ -35,7 +39,6 @@ jobs:
           name: prime-checker-binary
           path: usr/bin/prime-checker
 
-
   test:
     runs-on: ubuntu-latest
     needs: build
@@ -56,7 +59,6 @@ jobs:
         run: |
           chmod +x cicd/run_tests.sh
           ./cicd/run_tests.sh
-
 
   package:
     runs-on: ubuntu-latest
@@ -80,7 +82,6 @@ jobs:
           name: prime-checker-deb
           path: build/*.deb
 
-
   docker:
     runs-on: ubuntu-latest
     needs: package
@@ -101,6 +102,18 @@ jobs:
           chmod +x cicd/run_docker.sh
           ./cicd/run_docker.sh
 
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t $IMAGE_NAME:latest .
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG_NAME="${GITHUB_REF#refs/tags/}"
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$TAG_NAME
+            docker push $IMAGE_NAME:$TAG_NAME
+          fi
+          docker push $IMAGE_NAME:latest
 
   release:
     runs-on: ubuntu-latest
@@ -118,8 +131,6 @@ jobs:
         run: |
           chmod +x cicd/run_package.sh
           ./cicd/run_package.sh
-          chmod +x cicd/run_release.sh
-          ./cicd/run_release.sh
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
