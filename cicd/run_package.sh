@@ -9,13 +9,13 @@ make
 cd ..
 
 rm -rf build
-mkdir -p build/prime-checker_1.0.0_amd64/usr/bin
-mkdir -p build/prime-checker_1.0.0_amd64/DEBIAN
+mkdir -p build/prime-checker_1.1.0_amd64/usr/bin
+mkdir -p build/prime-checker_1.1.0_amd64/DEBIAN
 
-cp usr/bin/prime-checker build/prime-checker_1.0.0_amd64/usr/bin/
-cp DEBIAN/control build/prime-checker_1.0.0_amd64/DEBIAN/control
+cp usr/bin/prime-checker build/prime-checker_1.1.0_amd64/usr/bin/
+cp DEBIAN/control build/prime-checker_1.1.0_amd64/DEBIAN/control
 
-dpkg-deb --build build/prime-checker_1.0.0_amd64
+dpkg-deb --build build/prime-checker_1.1.0_amd64
 
 echo "Package created:"
 ls -l build/*.deb
