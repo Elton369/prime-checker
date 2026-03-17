@@ -8,6 +8,8 @@ RUN apt-get update && \
 
 COPY build/*.deb /app/
 
-RUN dpkg -i /app/*.deb || apt-get update && apt-get install -f -y
+RUN dpkg -i /app/*.deb || (apt-get update && apt-get install -f -y)
+
+EXPOSE 8080
 
 CMD ["prime-checker"]

@@ -1,10 +1,9 @@
 Package: prime-checker
-Version: 1.1.0
+Version: 1.2.0
 Section: utils
 Priority: optional
 Architecture: amd64
-Maintainer: elton <elton@mail.com>
-Depends: libc6 (>= 2.31), libstdc++6 (>= 10)
-Description: Prime number checker
- Simple console application that checks whether a number is prime.
- Built for DevOps laboratory work.
+Maintainer: Elton <elton@mail.ru>
+Depends: libc6 (>= 2.38), libstdc++6 (>= 13)
+Description: Prime checker HTTP service
+ A C++ HTTP service for prime number checking with Prometheus metrics.
