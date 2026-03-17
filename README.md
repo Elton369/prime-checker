@@ -1,93 +1,245 @@
-# prime-checker
+# Prime Checker
 
+Проект по курсу «Технологии распространения, развертывания и сопровождения ПО».  
+Выполнены практические работы №1–4 (вариант 2).
 
+---
 
-## Getting started
+## Описание
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Приложение на C++, которое:
+- проверяет число на простоту;
+- работает как HTTP-сервис;
+- предоставляет метрики для Prometheus;
+- разворачивается в Docker и Kubernetes;
+- собирается и публикуется через CI/CD pipeline.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+---
 
-## Add your files
+## Функциональность
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+Доступные endpoint'ы:
 
+- GET /health — проверка доступности
+- GET /prime?n=17 — проверка числа
+- GET /metrics — метрики Prometheus
+
+### Примеры
+
+```bash
+curl http://127.0.0.1:8080/health
+curl "http://127.0.0.1:8080/prime?n=17"
+curl http://127.0.0.1:8080/metrics
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/Elton369/prime-checker.git
-git branch -M main
-git push -uf origin main
+
+---
+
+## Структура проекта
+
+```text
+prime-checker/
+├── .github/workflows/ci.yml
+├── cicd/
+│   ├── run_make.sh
+│   ├── run_tests.sh
+│   ├── run_package.sh
+│   ├── run_docker.sh
+│   └── run_release.sh
+├── DEBIAN/control
+├── k8s/
+│   ├── deployment.yaml
+│   ├── namespace.yaml
+│   ├── service.yaml
+│   └── servicemonitor.yaml
+├── src/
+│   ├── main.cpp
+│   └── Makefile
+├── usr/bin/.gitkeep
+├── .gitignore
+├── Dockerfile
+└── README.md
 ```
 
-## Integrate with your tools
+---
 
-* [Set up project integrations](https://gitlab.com/Elton369/prime-checker/-/settings/integrations)
+# Практическая работа №1
 
-## Collaborate with your team
+## Что сделано
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+- разработана программа на C++;
+- сборка через make;
+- проверка компилятора;
+- создан .deb пакет;
+- учтены зависимости.
 
-## Test and Deploy
+## Сборка
 
-Use the built-in continuous integration in GitLab.
+```bash
+cd src
+make clean
+make
+cd ..
+```
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+## Запуск
 
-***
+```bash
+./usr/bin/prime-checker
+```
 
-# Editing this README
+## Сборка .deb
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```bash
+chmod +x cicd/run_package.sh
+./cicd/run_package.sh
+```
 
-## Suggestions for a good README
+---
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+# Практическая работа №2 (CI/CD)
 
-## Name
-Choose a self-explaining name for your project.
+## Что сделано
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+- настроен pipeline;
+- этапы: build → test → package → docker → release;
+- добавлены тесты;
+- публикация .deb в релизах.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## Локальная проверка
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+```bash
+chmod +x cicd/run_make.sh
+./cicd/run_make.sh
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+chmod +x cicd/run_tests.sh
+./cicd/run_tests.sh
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+chmod +x cicd/run_package.sh
+./cicd/run_package.sh
+```
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+---
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+# Практическая работа №3 (Docker)
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+## Что сделано
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+- создан Dockerfile;
+- приложение упаковано в контейнер;
+- добавлен docker-этап в CI;
+- образ публикуется в GHCR.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## Сборка контейнера
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+```bash
+docker build -t prime-checker:test .
+```
 
-## License
-For open source projects, say how it is licensed.
+## Запуск контейнера
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+```bash
+docker run -d --name prime-checker-test -p 8080:8080 prime-checker:test
+```
+
+## Проверка
+
+```bash
+curl http://127.0.0.1:8080/health
+curl "http://127.0.0.1:8080/prime?n=11"
+curl http://127.0.0.1:8080/metrics
+```
+
+## Остановка
+
+```bash
+docker stop prime-checker-test
+docker rm prime-checker-test
+```
+
+## Docker образ
+
+```bash
+docker pull ghcr.io/elton369/prime-checker:latest
+docker pull ghcr.io/elton369/prime-checker:v1.1.0
+```
+
+---
+
+# Практическая работа №4 (Kubernetes и мониторинг)
+
+## Что сделано
+
+- создан Deployment;
+- создан Service;
+- приложение развёрнуто в Kubernetes;
+- установлен Prometheus;
+- настроен сбор метрик;
+- добавлен ServiceMonitor.
+
+## Развертывание
+
+```bash
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+```
+
+## Проверка
+
+```bash
+kubectl get pods -n prime-checker
+kubectl get svc -n prime-checker
+```
+
+## Доступ к сервису
+
+```bash
+kubectl port-forward -n prime-checker svc/prime-checker-service 8080:8080
+```
+
+```bash
+curl http://127.0.0.1:8080/health
+```
+
+## Установка Prometheus
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --create-namespace
+```
+
+## Подключение мониторинга
+
+```bash
+kubectl apply -f k8s/servicemonitor.yaml
+```
+
+## Проверка метрик
+
+```bash
+curl http://127.0.0.1:8080/metrics
+```
+
+Пример:
+
+```text
+prime_checker_requests_total
+prime_checker_prime_requests_total
+```
+
+---
+
+## Технологии
+
+- C++
+- Make
+- Debian (.deb)
+- GitHub Actions (CI/CD)
+- Docker
+- GitHub Container Registry (GHCR)
+- Kubernetes
+- Prometheus
