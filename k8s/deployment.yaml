@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: prime-checker
-          image: ghcr.io/elton369/prime-checker:v1.2.0
+          image: ghcr.io/elton369/prime-checker:v1.3.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
